@@ -59,26 +59,21 @@ yarn android
 # or
 npm run android
 yarn android# ornpm run android
-Deep Linking
-The app supports deep linking with the following URL scheme:
 
 Custom URL scheme: shoppingapp://app/product/{productId}
-Web URL: https://shoppingapp.com/product/{productId}
-Testing Deep Links
-iOS Simulator:
 
-bash
-Run
-xcrun simctl openurl booted "shoppingapp://app/product/1"
-Android Emulator:
 
-bash
-Run
-adb shell am start -W -a android.intent.action.VIEW -d "shoppingapp://app/product/1"
 Project Structure
 plaintext
 
-src/├── components/      # Reusable components├── navigation/      # Navigation configuration├── screens/         # Screen components├── services/        # API services├── store/          # Redux store and slices├── types/          # TypeScript types└── utils/          # Utility functions
+src/── components/      # Reusable components├
+        assets/         #assets like image and svg
+     ── navigation/      # Navigation configuration
+     ── screens/         # Screen components├
+     ── services/        # API services├──
+      store/          # Redux store and slices├── 
+      types/          # TypeScript types└── 
+      utils/          # Utility functions
 Tech Stack
 React Native
 TypeScript
