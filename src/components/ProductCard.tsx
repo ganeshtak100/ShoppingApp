@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Product} from '../types';
 
 type Props = {
@@ -9,13 +9,13 @@ type Props = {
 
 const ProductCard: React.FC<Props> = ({product, onPress}) => {
   return (
-    <Pressable onPress={onPress} style={styles.card}>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
       <Image source={{uri: product.image}} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+        <Text style={styles.name}>{product?.title ?? ''}</Text>
+        <Text style={styles.price}>${product?.price?.toFixed(2)}</Text>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 

@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import Header from '../components/Header';
 import {RootState} from '../store';
 import {removeFromCart, updateQuantity} from '../store/cartSlice';
 
@@ -30,12 +31,13 @@ const CartScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Header title="Cart" />
       <FlatList
         data={cartItems}
         keyExtractor={item => item.id.toString()}
         renderItem={({item}) => (
           <View style={styles.cartItem}>
-            <Image source={{uri: item.image}} style={styles.image} />
+            <Image source={{uri: item.image}} style={styles.cartItemImage} />
             <View style={styles.itemDetails}>
               <Text style={styles.name}>{item.name}</Text>
               <Text style={styles.price}>${item.price.toFixed(2)}</Text>
@@ -66,9 +68,17 @@ const CartScreen = () => {
           <Text style={styles.emptyText}>Your cart is empty</Text>
         }
       />
+      {/* {cartItems.length > 0 && (
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>Total: ${totalPrice.toFixed(2)}</Text>
+        </View>
+      )} */}
       {cartItems.length > 0 && (
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>Total: ${totalPrice.toFixed(2)}</Text>
+          <TouchableOpacity style={styles.checkoutButton}>
+            <Text style={styles.checkoutButtonText}>Checkout</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -80,6 +90,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  checkoutButton: {
+    backgroundColor: '#47b347',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  checkoutButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   cartItem: {
     flexDirection: 'row',
     padding: 10,
@@ -90,6 +111,11 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 4,
+  },
+  cartItemImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
   itemDetails: {
     flex: 1,
@@ -142,6 +168,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'right',
+    color: '#000',
+    paddingVertical: 9,
   },
 });
 

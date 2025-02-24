@@ -1,5 +1,5 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -11,8 +11,10 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Header from '../components/Header';
 import ProductCard from '../components/ProductCard';
 import Shimmer from '../components/Shimmer';
+import {useDebounce} from '../hooks/useDebounce';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {api} from '../services/api';
 import {Product} from '../types';
@@ -23,46 +25,51 @@ type Props = {
 const ProductListScreen: React.FC<Props> = ({navigation}) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [isFetching, setFetching] = useState(false);
+  // const [page, setPage] = useState(1);
+  const pageNumber = useRef(1);
   const [searchQuery, setSearchQuery] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const fadeAnim = new Animated.Value(0);
-  const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>();
-
+  const searchTextDebounce = useDebounce(searchQuery, 800);
   // Memoize filtered products
   const filteredProducts = useMemo(() => {
+    if (!searchTextDebounce) return products;
     return products.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      product?.title
+        ?.toLowerCase()
+        ?.includes(searchTextDebounce?.toLowerCase()),
     );
-  }, [products, searchQuery]);
+  }, [products, searchTextDebounce]);
+  console.log('filteredProducts--', filteredProducts);
   // Debounced search handler
   const handleSearch = useCallback((text: string) => {
-    if (searchDebounce) {
-      clearTimeout(searchDebounce);
-    }
-
-    setSearchDebounce(
-      setTimeout(() => {
-        setSearchQuery(text);
-      }, 300),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setSearchQuery(text);
+  }, []);
+  useEffect(() => {
+    loadProducts();
   }, []);
   const loadProducts = async (refresh = false) => {
+    if (isFetching) return;
     if (loading && !refresh) return;
-    setLoading(true);
+    if (pageNumber.current === 1) {
+      setLoading(true);
+    } else {
+      setFetching(true);
+    }
     setError(null);
 
     try {
-      const newProducts = await api.getProducts(refresh ? 1 : page);
+      const newProducts = await api.getProducts(
+        refresh ? 1 : pageNumber.current,
+      );
+      // console.log('newProducts--', newProducts);
       if (refresh) {
         setProducts(newProducts);
-        setPage(2);
       } else {
         setProducts(prev => [...prev, ...newProducts]);
-        setPage(prev => prev + 1);
       }
 
       Animated.timing(fadeAnim, {
@@ -79,6 +86,7 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setFetching(false);
     }
   };
 
@@ -110,7 +118,7 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
       return (
         <View style={styles.emptyStateContainer}>
           <Text style={styles.emptyStateText}>
-            No products found matching "{searchQuery}"
+            No products found matching {searchQuery}
           </Text>
         </View>
       );
@@ -126,38 +134,40 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
 
     return null;
   };
+  const loadMoreData = () => {
+    console.log('called Loading more data', pageNumber.current);
+    if (!loading && !isFetching && searchQuery === '') {
+      pageNumber.current = pageNumber.current + 1;
+      loadProducts();
+    }
+  };
   return (
     <View style={styles.container}>
-      <Animated.View style={{opacity: fadeAnim}}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search products..."
-          value={searchQuery}
-          onChangeText={handleSearch}
-          //   onChangeText={setSearchQuery}
-          returnKeyType="search"
-          clearButtonMode="while-editing"
-        />
-      </Animated.View>
-
+      <Header title="Products" currentScreen="products" />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search products..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        returnKeyType="search"
+        clearButtonMode="while-editing"
+      />
       <FlatList
         data={filteredProducts}
         renderItem={({item}) => (
-          <Animated.View style={{opacity: fadeAnim}}>
-            <ProductCard
-              product={item}
-              onPress={() =>
-                navigation.navigate('ProductDetails', {productId: item.id})
-              }
-            />
-          </Animated.View>
+          <ProductCard
+            product={item}
+            onPress={() =>
+              navigation.navigate('ProductDetails', {productId: item.id})
+            }
+          />
         )}
-        keyExtractor={item => item.id.toString()}
-        onEndReached={loadProducts}
-        onEndReachedThreshold={0.5}
+        keyExtractor={(item, index) => index.toString()}
+        onEndReached={loadMoreData}
+        onEndReachedThreshold={0.2}
         // ListEmptyComponent={() => (loading ? renderShimmerLoader() : null)}
         ListFooterComponent={() =>
-          loading && products.length > 0 ? (
+          isFetching ? (
             <ActivityIndicator size="large" style={styles.loader} />
           ) : null
         }
@@ -166,7 +176,10 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
         }
         ListEmptyComponent={renderEmptyState}
         contentContainerStyle={
-          filteredProducts.length === 0 ? styles.emptyList : undefined
+          // filteredProducts.length === 0 ? styles.emptyList : undefined
+          {
+            flexGrow: 1,
+          }
         }
       />
     </View>

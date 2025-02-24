@@ -21,21 +21,21 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export const AppNavigator = () => {
   return (
     <NavigationContainer linking={linking}>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="ProductList">
         <Stack.Screen
           name="ProductList"
           component={ProductListScreen}
-          options={{title: 'Products'}}
+          options={{title: 'Products', headerShown: false}}
         />
         <Stack.Screen
           name="ProductDetails"
           component={ProductDetailsScreen}
-          options={{title: 'Product Details'}}
+          options={{title: 'Product Details', headerShown: false}}
         />
         <Stack.Screen
           name="Cart"
           component={CartScreen}
-          options={{title: 'Shopping Cart'}}
+          options={{title: 'Shopping Cart', headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
