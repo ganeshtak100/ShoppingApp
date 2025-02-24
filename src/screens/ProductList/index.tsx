@@ -1,23 +1,24 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
   Animated,
   FlatList,
   RefreshControl,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import Header from '../components/Header';
-import ProductCard from '../components/ProductCard';
-import Shimmer from '../components/Shimmer';
-import {useDebounce} from '../hooks/useDebounce';
-import {RootStackParamList} from '../navigation/AppNavigator';
-import {api} from '../services/api';
-import {Product} from '../types';
+import Header from '../../components/Header';
+import ProductCard from '../../components/ProductCard';
+import Shimmer from '../../components/Shimmer';
+import {useDebounce} from '../../hooks/useDebounce';
+import {RootStackParamList} from '../../navigation/AppNavigator';
+import {api} from '../../services/api';
+import {Product} from '../../types';
+import {styles} from './style';
+
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'ProductList'>;
 };
@@ -34,6 +35,7 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const fadeAnim = new Animated.Value(0);
   const searchTextDebounce = useDebounce(searchQuery, 800);
+
   // Memoize filtered products
   const filteredProducts = useMemo(() => {
     if (!searchTextDebounce) return products;
@@ -43,11 +45,7 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
         ?.includes(searchTextDebounce?.toLowerCase()),
     );
   }, [products, searchTextDebounce]);
-  console.log('filteredProducts--', filteredProducts);
-  // Debounced search handler
-  const handleSearch = useCallback((text: string) => {
-    setSearchQuery(text);
-  }, []);
+
   useEffect(() => {
     loadProducts();
   }, []);
@@ -118,7 +116,7 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
       return (
         <View style={styles.emptyStateContainer}>
           <Text style={styles.emptyStateText}>
-            No products found matching {searchQuery}
+            No products found matching "{searchQuery}"
           </Text>
         </View>
       );
@@ -153,6 +151,7 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
         clearButtonMode="while-editing"
       />
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={filteredProducts}
         renderItem={({item}) => (
           <ProductCard
@@ -185,62 +184,5 @@ const ProductListScreen: React.FC<Props> = ({navigation}) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  searchInput: {
-    margin: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-  shimmerContainer: {
-    padding: 10,
-  },
-  shimmerItem: {
-    flexDirection: 'row',
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-  },
-  shimmerImage: {
-    borderRadius: 4,
-  },
-  shimmerContent: {
-    flex: 1,
-    marginLeft: 10,
-    justifyContent: 'center',
-  },
-  shimmerText: {
-    marginBottom: 8,
-    borderRadius: 4,
-  },
-  shimmerPrice: {
-    borderRadius: 4,
-  },
-  loader: {
-    marginVertical: 20,
-  },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 50,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-  emptyList: {
-    flexGrow: 1,
-  },
-});
 
 export default ProductListScreen;

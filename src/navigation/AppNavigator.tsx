@@ -1,9 +1,9 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import CartScreen from '../screens/CartScreen';
-import ProductDetailsScreen from '../screens/ProductDetailsScreen';
-import ProductListScreen from '../screens/ProductListScreen';
+import CartScreen from '../screens/Cart';
+import ProductDetailsScreen from '../screens/ProductDetail';
+import ProductListScreen from '../screens/ProductList';
 import {linking} from './linking';
 
 export type RootStackNavigationProp = {

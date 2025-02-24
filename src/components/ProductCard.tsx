@@ -1,5 +1,6 @@
 import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {theme} from '../theme';
 import {Product} from '../types';
 
 type Props = {
@@ -42,10 +43,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     justifyContent: 'center',
+    color: theme.colors.text.primary,
+    opacity: 0.8,
   },
   name: {
     fontSize: 16,
     fontWeight: '600',
+    color: theme.colors.text.primary,
   },
   price: {
     fontSize: 14,

@@ -32,7 +32,6 @@ function Header({title, currentScreen}: Readonly<IHeaderProps>) {
         <TouchableOpacity
           onPress={() => navigation.navigate('Cart')}
           style={styles.cartButton}>
-          {/* <MaterialIcons name="shopping-cart" size={24} color="white" /> */}
           <Icons.Cart />
           {cartItemCount > 0 && (
             <View style={styles.badge}>
@@ -49,12 +48,12 @@ export default Header;
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
-    right: 0,
-    top: 0,
+    right: -5,
+    top: -8,
     backgroundColor: '#ff4444',
     borderRadius: 10,
-    width: 20,
-    height: 20,
+    width: 16,
+    height: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -64,10 +63,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cartButton: {
-    padding: 8,
+    paddingBottom: 8,
   },
   backButton: {
-    padding: 8,
+    paddingBottom: 8,
   },
   header: {
     paddingTop: 24,
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
   },
   headerTitle: {
     flex: 1,
@@ -84,5 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+    paddingBottom: 8,
   },
 });
